@@ -1,3 +1,3 @@
-const API = "http://localhost:5000";
+const API = "https://dentify-ai-powered-dentist-appointment.onrender.com";
 
 export default API;
