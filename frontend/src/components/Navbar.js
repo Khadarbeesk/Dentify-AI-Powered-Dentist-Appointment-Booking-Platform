@@ -1,0 +1,179 @@
+
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+export default function Navbar() {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    setOpen(false);
+    alert("Logged out");
+    navigate("/login");
+  };
+
+  const scrollToContact = () => {
+    document.getElementById("contact")?.scrollIntoView({
+      behavior: "smooth"
+    });
+    setOpen(false);
+  };
+
+  const closeMenu = () => setOpen(false);
+
+  return (
+    <div className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-20 py-4 bg-white shadow-md z-50">
+
+      {/* LOGO */}
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        <img
+          src="/logoo.png"
+          alt="Dentify logo"
+          className="w-10 h-10 object-contain"
+        />
+
+        <h1 className="text-xl md:text-2xl font-bold text-blue-600">
+          Dent<span className="text-indigo-600">ify</span>
+        </h1>
+      </div>
+
+      {/* DESKTOP MENU */}
+      <div className="space-x-6 font-medium hidden md:flex items-center">
+
+        {role === "user" && (
+          <>
+            <Link to="/" className="hover:text-blue-500">
+              Home
+            </Link>
+
+            <Link to="/patient-dashboard" className="hover:text-blue-500">
+              My Profile
+            </Link>
+
+            <Link
+              to="/my-appointments"
+              className="hover:text-blue-500"
+            >
+              My Bookings
+            </Link>
+
+            <button
+              onClick={scrollToContact}
+              className="hover:text-blue-500"
+            >
+              Contact
+            </button>
+          </>
+        )}
+
+        {/* GUEST MENU */}
+        {!token && (
+          <>
+            <Link to="/" className="hover:text-blue-500">
+              Home
+            </Link>
+
+            <button
+              onClick={scrollToContact}
+              className="hover:text-blue-500"
+            >
+              Contact
+            </button>
+          </>
+        )}
+
+        {/* LOGIN / LOGOUT */}
+        {token ? (
+          <button
+            onClick={logout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+          >
+            Login
+          </Link>
+        )}
+      </div>
+
+      {/* MOBILE BUTTON */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setOpen(!open)}
+          className="text-2xl"
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* MOBILE MENU */}
+      {open && (
+        <div className="absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-center gap-4 py-5 md:hidden">
+
+          {role === "user" && (
+            <>
+              <Link to="/" onClick={closeMenu}>
+                Home
+              </Link>
+
+              <Link to="/patient-dashboard" onClick={closeMenu}>
+                My Profile
+              </Link>
+
+              <Link to="/my-appointments" onClick={closeMenu}>
+                My Bookings
+              </Link>
+
+              <button onClick={scrollToContact}>
+                Contact
+              </button>
+            </>
+          )}
+
+          {!token && (
+            <>
+              <Link to="/" onClick={closeMenu}>
+                Home
+              </Link>
+
+              <button onClick={scrollToContact}>
+                Contact
+              </button>
+            </>
+          )}
+
+          {token ? (
+            <button
+              onClick={logout}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={closeMenu}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            >
+              Login
+            </Link>
+          )}
+
+        </div>
+      )}
+    </div>
+  );
+}
