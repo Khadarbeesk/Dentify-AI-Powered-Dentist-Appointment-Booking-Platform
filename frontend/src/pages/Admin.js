@@ -194,10 +194,10 @@ useEffect(() => {
           `${API}/api/dentists/${editingDoctor._id}`,
           {
             method: "PUT",
-            headers: {
-              ...headers,
-              "Content-Type": "application/json"
-            },
+           headers: {
+  Authorization: `Bearer ${token}`,
+  "Content-Type": "application/json"
+},
             body: JSON.stringify(payload)
           }
         );
@@ -213,9 +213,9 @@ useEffect(() => {
         const response = await fetch(`${API}/api/dentists/admin/add`, {
           method: "POST",
           headers: {
-            ...headers,
-            "Content-Type": "application/json"
-          },
+  Authorization: `Bearer ${token}`,
+  "Content-Type": "application/json"
+},
           body: JSON.stringify(payload)
         });
 
