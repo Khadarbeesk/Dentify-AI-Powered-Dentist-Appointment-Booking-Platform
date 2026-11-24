@@ -47,14 +47,15 @@ export default function Admin() {
   
 const token = localStorage.getItem("token");
 
-const headers = {
-  Authorization: `Bearer ${token}`
-};
+
 
 const loadData = useCallback(async () => {
   try {
     setLoading(true);
     setError("");
+    const headers = {
+  Authorization: `Bearer ${token}`
+};
 
     const [appointmentResponse, doctorResponse] = await Promise.all([
       fetch(`${API}/api/appointments`, { headers }),
