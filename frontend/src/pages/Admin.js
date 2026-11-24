@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminCharts from "../components/AdminCharts";
 import API from "../config";
@@ -44,49 +44,56 @@ export default function Admin() {
   const [success, setSuccess] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const token = localStorage.getItem("token");
+  
+const token = localStorage.getItem("token");
 
-  const headers = {
-    Authorization: `Bearer ${token}`
-  };
+const headers = {
+  Authorization: `Bearer ${token}`
+};
 
-  useEffect(() => {
-    if (
-      localStorage.getItem("role") !== "admin" ||
-      !token
-    ) {
-      navigate("/login", { replace: true });
-      return;
+const loadData = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const [appointmentResponse, doctorResponse] = await Promise.all([
+      fetch(`${API}/api/appointments`, { headers }),
+      fetch(`${API}/api/dentists`)
+    ]);
+
+    if (!appointmentResponse.ok || !doctorResponse.ok) {
+      throw new Error("Unable to load dashboard information.");
     }
 
-    loadData();
-  }, [navigate]);
+    const appointmentData = await appointmentResponse.json();
+    const doctorData = await doctorResponse.json();
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError("");
+    setAppointments(Array.isArray(appointmentData) ? appointmentData : []);
+    setDoctors(Array.isArray(doctorData) ? doctorData : []);
 
-      const [appointmentResponse, doctorResponse] = await Promise.all([
-        fetch(`${API}/api/appointments`, { headers }),
-        fetch(`${API}/api/dentists`)
-      ]);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}, [token]);
 
-      if (!appointmentResponse.ok || !doctorResponse.ok) {
-        throw new Error("Unable to load dashboard information.");
-      }
+useEffect(() => {
+  if (
+    localStorage.getItem("role") !== "admin" ||
+    !token
+  ) {
+    navigate("/login", { replace: true });
+    return;
+  }
 
-      const appointmentData = await appointmentResponse.json();
-      const doctorData = await doctorResponse.json();
+  loadData();
+}, [navigate, token, loadData]);
 
-      setAppointments(Array.isArray(appointmentData) ? appointmentData : []);
-      setDoctors(Array.isArray(doctorData) ? doctorData : []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
+
+   
+    
 
   const stats = useMemo(() => ({
     total: appointments.length,
