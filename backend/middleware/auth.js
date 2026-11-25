@@ -1,32 +1,32 @@
-const register = async (e) => {
-  e.preventDefault();
+const jwt = require("jsonwebtoken");
 
-  if (!validate()) return;
-
+module.exports = function (req, res, next) {
   try {
-    const res = await fetch(`${API}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    });
+    const authHeader = req.header("Authorization");
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || data.msg || "Registration failed");
-      return;
+    if (!authHeader) {
+      return res.status(401).json({
+        msg: "No token, authorization denied"
+      });
     }
 
-    alert(
-      data.message ||
-      data.msg ||
-      "Registration successful! Please log in."
-    );
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
 
-    navigate("/login");
+    if (!token) {
+      return res.status(401).json({
+        msg: "Token missing"
+      });
+    }
 
-  } catch (error) {
-    console.error("Registration error:", error);
-    alert("Unable to connect to the server. Please try again.");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+
+    next();
+  } catch (err) {
+    res.status(401).json({
+      msg: "Token is not valid"
+    });
   }
 };
