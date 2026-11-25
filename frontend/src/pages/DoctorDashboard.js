@@ -814,14 +814,8 @@ export default function DoctorDashboard() {
                           ],
                           ["Clinic Name", doctorClinic],
                           ["Clinic Location", doctorLocation],
-                          [
-                            "Email",
-                            storedUser.email || "Not available"
-                          ],
-                          [
-                            "Phone",
-                            storedUser.phone || storedUser.mobile || "Not available"
-                          ],
+                        
+                        
                           ["Account Role", "Doctor"]
                         ].map(([label, value]) => (
                           <div

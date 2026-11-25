@@ -41,7 +41,7 @@ const dentistSchema = new mongoose.Schema({
 
   slotDuration: {
     type: Number,
-    default: 30
+    default:60
   }
 
 }, { timestamps: true });
